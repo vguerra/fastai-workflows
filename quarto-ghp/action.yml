@@ -47,7 +47,7 @@ runs:
           pip install -Uq nbdev
         fi
         if [ $USE_REQUIREMENTS_FILE ]; then
-          test -f setup.py && pip install -r requirements.tt -e ".[dev]"
+          test -f setup.py && pip install -r requirements.txt -e ".[dev]"
         else
           test -f setup.py && pip install -e ".[dev]"
         fi
