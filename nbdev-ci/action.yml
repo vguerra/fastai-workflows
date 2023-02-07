@@ -17,6 +17,11 @@ inputs:
     description: 'Space separated list of nbdev test flags to run that are normally ignored'
     required: false
     default: ''
+  use_requirements_file:
+    type: boolean
+    description: 'Using requirements.txt file during installation of package?'
+    required: false
+    default: false
 
 runs:
   using: "composite"
@@ -32,6 +37,7 @@ runs:
         USE_PRE: ${{ inputs.pre }}
         SKIP_TEST: ${{ inputs.skip_test }}
         FLAGS: ${{ inputs.flags }}
+        USE_REQUIREMENTS_FILE: ${{ inputs.use_requirements_file }}
       shell: bash
       run: |
         set -ux
@@ -45,7 +51,11 @@ runs:
           pip install -U nbdev
         fi
         echo "Doing editable install..."
-        test -f setup.py && pip install -e ".[dev]"
+        if [ $USE_REQUIREMENTS_FILE ]; then
+          test -f setup.py && pip install -r requirements.tt -e ".[dev]"
+        else
+          test -f setup.py && pip install -e ".[dev]"
+        fi
         echo "Check we are starting with clean git checkout"
         if [[ `git status --porcelain -uno` ]]; then
           git diff

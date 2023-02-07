@@ -13,6 +13,11 @@ inputs:
     description: 'GitHub token'
     default: ${{ github.token }}
     required: false
+  use_requirements_file:
+    type: boolean
+    description: 'Using requirements.txt file during installation of package?'
+    required: false
+    default: false
 
 runs:
   using: "composite"
@@ -26,6 +31,7 @@ runs:
     - name: Install Dependencies
       env:
         USE_PRE: ${{ inputs.pre }}
+        USE_REQUIREMENTS_FILE: ${{ inputs.use_requirements_file }}
       shell: bash
       run: |
         set -ux
@@ -40,7 +46,11 @@ runs:
         else
           pip install -Uq nbdev
         fi
-        test -f setup.py && pip install -e ".[dev]"
+        if [ $USE_REQUIREMENTS_FILE ]; then
+          test -f setup.py && pip install -r requirements.tt -e ".[dev]"
+        else
+          test -f setup.py && pip install -e ".[dev]"
+        fi
         nbdev_docs
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
